@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sql_app import schemas, databases, crud, models
 import logging
@@ -71,21 +72,37 @@ def remover_produto(
 
     return {"message": "Ação realizada com sucesso"}
 
-@app.put('/atualizar_produto/{id}', response_model=schemas.get_prod)
+@app.put('/atualizar_produto/{id}', response_model=schemas.AtualizacaoResponse)
 def atualizar_produto(id: int, produto_update: schemas.update, db: Session = Depends(get_db)):
-    produto = db.query(models.Item).filter(models.Item.id == id).first()
-    if produto:
-        # Atualizar os campos conforme fornecido
-        for key, value in produto_update.dict(exclude_unset=True).items():
-            setattr(produto, key, value)
-        db.commit()
-        db.refresh(produto)
-        produto_dict = {
-            "id": produto.id,
-            "quantidade": produto.quantidade,
-            "valor": produto.valor
-        }
-        return schemas.update.parse_obj(produto_dict)
+    try:
+        produto = db.query(models.Item).filter(models.Item.id == id).first()
+        if produto:
+            # Atualizar os campos conforme fornecido
+            for key, value in produto_update.dict(exclude_unset=True).items():
+                setattr(produto, key, value)
+            db.commit()
+            db.refresh(produto)
+            produto_dict = {
+                "id": produto.id,
+                "produto": produto.produto,
+                "quantidade": produto.quantidade,
+                "valor": produto.valor
+            }
+            return schemas.AtualizacaoResponse( 
+            produto=schemas.get_prod(**produto_dict),
+            message = "Ação realizada com sucesso")
 
-    else:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
+        else:
+            raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+    except Exception as e:
+        # Mensagem de erro personalizada em caso de falha na atualização
+        db.rollback()  # Reverte a transação em caso de erro
+        return JSONResponse(
+            status_code=500,
+            content={
+                "detail": "Erro ao atualizar o produto no banco de dados.",
+                "message": str(e)  # Inclui a mensagem de erro real
+            }
+        )
+    return {"message": "Ação realizada com sucesso"}

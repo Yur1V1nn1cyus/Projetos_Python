@@ -28,6 +28,10 @@ class update (BaseModel):
 #Parte response model
 class message (BaseModel):
       message: str
+
+class AtualizacaoResponse(BaseModel):
+    produto: get_prod
+    message: str
      
 #Classes de configurações das responses 
 class Config:
