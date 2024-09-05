@@ -1,0 +1,6 @@
+SQLAlchemy==2.0.31
+uvicorn==0.30.6
+pydantic-collections==0.6.0
+pydantic_core==2.20.1
+pydantic==2.8.2
+fastapi==0.112.1
