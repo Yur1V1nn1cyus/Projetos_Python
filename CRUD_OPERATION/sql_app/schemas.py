@@ -17,7 +17,7 @@ class get_prod (BaseModel):
 class remove_prod (BaseModel):
       message: str   
 
-class update (BaseModel):
+class ProdutoUpdate (BaseModel):
     produto: Optional[str] = None
     quantidade: Optional[int] = None
     valor: Optional[float] = None
