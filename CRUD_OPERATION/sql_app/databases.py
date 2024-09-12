@@ -5,7 +5,7 @@ from sql_app import models
 from fastapi import Depends
 
 #Conexão com o banco de dados, verificar a documentação de fastapi
-SQLALCHEMY_DATABASE_URL = "postgresql://yuri:teste123@localhost:8745/db_fastapi"
+SQLALCHEMY_DATABASE_URL = "postgresql://user:password@server:port/dbname"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
